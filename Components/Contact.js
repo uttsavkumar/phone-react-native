@@ -12,7 +12,29 @@ import database from '@react-native-firebase/database';
 import { Avatar } from 'native-base';
 import ImagePicker from 'react-native-image-crop-picker';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { useNavigation } from '@react-navigation/native';
+import Header from './Header';
+import { Button, Modal as NewModal, FormControl, Input, Center, NativeBaseProvider } from "native-base";
 
+const DeleteModal = ({ id, setDelmodal }) => {
+  console.log(id)
+  return (
+
+
+    <NewModal.Content style={{ backgroundColor: '#3a3a3a', poistion: 'absolute', top: 300 }} width="100">
+      <NewModal.Body style={{ alignItems: 'center' }}>
+        <Pressable onPress={() => {
+          database().ref(`contact/${id}`).remove().then(() => {
+            setDelmodal(false)
+          })
+        }}>
+          <IconMI name='delete-outline' size={30} />
+        </Pressable>
+      </NewModal.Body>
+    </NewModal.Content>
+
+  )
+}
 
 
 const Contact = () => {
@@ -76,12 +98,14 @@ const Contact = () => {
       setData(newdata)
     })
   }, [])
+  const navigation = useNavigation()
 
   const handleSinglePage = (id) => {
-    const data = database().ref(`contact/${id}`).once('value', function (snapshot) {
-      console.log(snapshot)
+   
+    navigation.navigate('single', {
+      id:id
+    
     })
-    console.log(id)
   }
 
   const handleImage = () => {
@@ -94,8 +118,25 @@ const Contact = () => {
       setImage(image.path)
     });
   }
+  const [delmodal, setDelmodal] = useState(false)
+  const [id, setId] = useState('')
+  const handleLongPress = (id) => {
+
+    setDelmodal(true)
+    setId(id)
+
+  }
+  const modalClose = () => {
+    setDelmodal(false)
+    setId('')
+  }
+
   return (
     <>
+
+      <NewModal isOpen={delmodal} onClose={modalClose} >
+        <DeleteModal id={id} setDelmodal={setDelmodal} />
+      </NewModal>
 
 
       <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -110,12 +151,12 @@ const Contact = () => {
               A
             </Text>
 
-            {/* <ScrollView bounces={false} showsVerticalScrollIndicator={false}> */}
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
 
               <View style={style.list}>
-                {/* {data.map((item, key) => (
-                  <Pressable key={item.key} onPress={() => handleSinglePage(item.key)}>
-                    <View style={{ marginBottom: 15, display: 'flex', flexDirection: 'row' }} >
+                {data.map((item, key) => (
+                  <Pressable key={item.key} onLongPress={() => handleLongPress(item.key)} onPress={() => handleSinglePage(item.key)} >
+                    <View style={{ marginBottom: 15, display: 'flex', flexDirection: 'row', }} >
                       {
                         item.image === "" ?
                           <Avatar style={{ backgroundColor: 'transparent', borderColor: 'white', borderWidth: .1 }} mr="1" mt="1" >
@@ -131,9 +172,9 @@ const Contact = () => {
                       </Text>
                     </View>
                   </Pressable>
-                ))} */}
+                ))}
 
-                <SwipeListView
+                {/* <SwipeListView
                 data={data}
                 renderItem={(data, rowMap) => (
                   <View style={style.rowFront}>
@@ -153,12 +194,12 @@ const Contact = () => {
                 )}
                 leftOpenValue={100}
                 rightOpenValue={-120}
-              />
+              /> */}
 
 
               </View>
 
-            {/* </ScrollView> */}
+            </ScrollView>
             <View style={style.footerdiv}>
               <Pressable style={style.footer} onPress={() => handleModal()}>
                 <Text style={{ fontSize: 30, alignSelf: 'center', textAlignVertical: 'center', fontWeight: '700', marginTop: 22 }}><IconI name='ios-add' size={22} /></Text>
@@ -434,26 +475,26 @@ const style = StyleSheet.create({
   }
 
 
-    ,
-    rowFront: {
-      alignItems: 'center',
-      backgroundColor: '#CCC',
-      borderBottomColor: 'black',
-      borderBottomWidth: 1,
-      justifyContent: 'center',
-      height: 50,
-    },
-    rowBack: {
-      alignItems: 'center',
-      backgroundColor: '#DDD',
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingLeft: 15,
-    },
-    backTextWhite: {
-      color: '#FFF',
-  },  backRightBtn: {
+  ,
+  rowFront: {
+    alignItems: 'center',
+    backgroundColor: '#CCC',
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    height: 50,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 15,
+  },
+  backTextWhite: {
+    color: '#FFF',
+  }, backRightBtn: {
     alignItems: 'center',
     bottom: 0,
     justifyContent: 'center',

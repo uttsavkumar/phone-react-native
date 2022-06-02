@@ -5,6 +5,7 @@ import React from 'react'
 import Header from './Components/Header';
 import Main from './Components/Main';
 import { NativeBaseProvider } from 'native-base';
+import Stack from './Components/Stack';
 
 const App = () => {
 
@@ -12,7 +13,8 @@ const App = () => {
     <>
       <NativeBaseProvider>
       <NavigationContainer >
-        <Header />
+      <Header />
+
         <Main/>
       </NavigationContainer>
       </NativeBaseProvider>
